@@ -1,20 +1,39 @@
-import Database from 'better-sqlite3'
+import { createClient } from '@libsql/client'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { mkdirSync } from 'node:fs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const dataDir = join(__dirname, '..', 'data')
-mkdirSync(dataDir, { recursive: true })
 
-const dbPath = process.env.DB_PATH || join(dataDir, 'cyber.db')
+// Local dev uses a file: SQLite database; production points DATABASE_URL at a
+// Turso (libsql://...) database with DATABASE_AUTH_TOKEN. Same client either way.
+const url = process.env.DATABASE_URL || `file:${join(dataDir, 'cyber.db')}`
+if (url.startsWith('file:')) mkdirSync(dataDir, { recursive: true })
 
-export const db = new Database(dbPath)
-db.pragma('journal_mode = WAL')
-db.pragma('foreign_keys = ON')
+export const db = createClient({ url, authToken: process.env.DATABASE_AUTH_TOKEN })
 
-// Schema. Created once; safe to run on every boot.
-db.exec(`
+// Normalise a libsql Row into a plain { column: value } object.
+function rowToObject(row, columns) {
+  const o = {}
+  for (const c of columns) o[c] = row[c]
+  return o
+}
+
+// Thin async helpers so call sites read close to the old better-sqlite3 ones.
+export async function get(sql, args = []) {
+  const r = await db.execute({ sql, args })
+  return r.rows.length ? rowToObject(r.rows[0], r.columns) : undefined
+}
+export async function all(sql, args = []) {
+  const r = await db.execute({ sql, args })
+  return r.rows.map((row) => rowToObject(row, r.columns))
+}
+export async function run(sql, args = []) {
+  return db.execute({ sql, args })
+}
+
+const SCHEMA = `
 CREATE TABLE IF NOT EXISTS users (
   id            INTEGER PRIMARY KEY AUTOINCREMENT,
   email         TEXT NOT NULL UNIQUE,
@@ -36,8 +55,8 @@ CREATE TABLE IF NOT EXISTS products (
   diagonal    TEXT NOT NULL DEFAULT '',
   protection  TEXT NOT NULL DEFAULT '',
   memory      TEXT NOT NULL DEFAULT '',
-  tabs        TEXT NOT NULL DEFAULT '[]',   -- JSON array: new|best|featured
-  discount    INTEGER NOT NULL DEFAULT 0,   -- shown in "Discounts up to -50%"
+  tabs        TEXT NOT NULL DEFAULT '[]',
+  discount    INTEGER NOT NULL DEFAULT 0,
   created_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -88,4 +107,11 @@ CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_cart_user ON cart_items(user_id);
 CREATE INDEX IF NOT EXISTS idx_fav_user ON favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
-`)
+`
+
+export async function initSchema() {
+  await db.executeMultiple(SCHEMA)
+}
+
+// Create the schema on first import so every entry point (server, seed CLI) is ready.
+await initSchema()

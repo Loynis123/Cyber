@@ -1,14 +1,19 @@
-# Render Blueprint — single Node web service that serves both the built
-# Vue SPA and the Express API from one origin.
+# Render Blueprint — single Node web service that serves both the built Vue SPA
+# and the Express API from one origin. Data is stored in Turso (cloud libSQL),
+# so no persistent disk (and no paid plan) is required.
 #
-# Deploy: push to GitHub, then in Render → "New +" → "Blueprint" and point it
-# at this repo. The persistent disk keeps the SQLite database across restarts
-# and deploys (a disk requires a paid instance type).
+# Before deploying, create a free Turso database (no card needed):
+#   1. https://turso.tech  → sign up with GitHub
+#   2. turso db create cyber-store
+#   3. turso db show cyber-store --url           # -> DATABASE_URL
+#   4. turso db tokens create cyber-store        # -> DATABASE_AUTH_TOKEN
+# Then set those two values on the service below (they are sync:false, so Render
+# will prompt for them in the dashboard on first deploy).
 services:
   - type: web
     name: cyber-store
     runtime: node
-    plan: starter # persistent disks are not available on the free plan
+    plan: free
     region: frankfurt # change to your nearest region (e.g. oregon, singapore)
     buildCommand: npm install && npm run build
     startCommand: npm start
@@ -21,9 +26,7 @@ services:
         generateValue: true # Render generates a strong random value once
       - key: JWT_EXPIRES_IN
         value: 7d
-      - key: DB_PATH
-        value: /var/data/cyber.db # must live on the mounted disk below
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGB: 1
+      - key: DATABASE_URL
+        sync: false # set in the dashboard: libsql://<db>-<org>.turso.io
+      - key: DATABASE_AUTH_TOKEN
+        sync: false # set in the dashboard: token from `turso db tokens create`

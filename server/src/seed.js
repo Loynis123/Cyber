@@ -2,7 +2,7 @@ import 'dotenv/config'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { dirname, join } from 'node:path'
 import bcrypt from 'bcryptjs'
-import { db } from './db.js'
+import { db, get, run } from './db.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const dataDir = join(__dirname, '..', '..', 'src', 'data')
@@ -99,30 +99,30 @@ export async function seed() {
   }
   const rows = [...map.values()].sort((a, b) => rank(a.name) - rank(b.name))
 
-  const insertProduct = db.prepare(`
-    INSERT INTO products (name, price, old_price, image, brand, category,
+  const insertSql = `INSERT INTO products (name, price, old_price, image, brand, category,
       battery, screen, diagonal, protection, memory, tabs, discount)
-    VALUES (@name, @price, @old_price, @image, @brand, @category,
-      @battery, @screen, @diagonal, @protection, @memory, @tabs, @discount)
-  `)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-  const reseed = db.transaction(() => {
-    db.exec('DELETE FROM products')
-    db.exec("DELETE FROM sqlite_sequence WHERE name='products'")
-    for (const r of rows) {
-      insertProduct.run({ ...r, tabs: JSON.stringify([...r.tabs]) })
-    }
-  })
-  reseed()
+  // Rewrite the products table atomically.
+  const statements = [
+    { sql: 'DELETE FROM products' },
+    { sql: "DELETE FROM sqlite_sequence WHERE name='products'" },
+    ...rows.map((r) => ({
+      sql: insertSql,
+      args: [r.name, r.price, r.old_price, r.image, r.brand, r.category,
+        r.battery, r.screen, r.diagonal, r.protection, r.memory, JSON.stringify([...r.tabs]), r.discount],
+    })),
+  ]
+  await db.batch(statements, 'write')
 
   // Demo user (idempotent).
   const demoEmail = 'demo@cyber.test'
-  const exists = db.prepare('SELECT id FROM users WHERE email = ?').get(demoEmail)
+  const exists = await get('SELECT id FROM users WHERE email = ?', [demoEmail])
   if (!exists) {
     const hash = bcrypt.hashSync('password123', 10)
-    db.prepare('INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)').run(
+    await run('INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)', [
       demoEmail, hash, 'Demo User',
-    )
+    ])
   }
 
   return { products: rows.length, demoEmail }
@@ -130,8 +130,8 @@ export async function seed() {
 
 // Seeds only when the products table is empty (used on server boot in prod).
 export async function seedIfEmpty() {
-  const { n } = db.prepare('SELECT COUNT(*) AS n FROM products').get()
-  if (n > 0) return { skipped: true, products: n }
+  const row = await get('SELECT COUNT(*) AS n FROM products')
+  if (row.n > 0) return { skipped: true, products: row.n }
   return seed()
 }
 

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { db } from '../db.js'
+import { get, all } from '../db.js'
 import { brands, filterGroups, sortOptions, categories } from '../catalog-meta.js'
 
 const router = Router()
@@ -49,7 +49,8 @@ router.get('/meta/brands', (_req, res) => res.json(brands))
 router.get('/meta/filters', (_req, res) => res.json({ filterGroups, sortOptions }))
 router.get('/meta/categories', (_req, res) => res.json(categories))
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res, next) => {
+ try {
   const where = []
   const params = []
 
@@ -90,7 +91,8 @@ router.get('/', (req, res) => {
   const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : ''
   const orderSql = SORT_SQL[req.query.sort] || SORT_SQL['By rating']
 
-  const total = db.prepare(`SELECT COUNT(*) AS n FROM products ${whereSql}`).get(...params).n
+  const totalRow = await get(`SELECT COUNT(*) AS n FROM products ${whereSql}`, params)
+  const total = totalRow.n
 
   // Pagination (optional — omit page to get everything).
   let limitSql = ''
@@ -100,9 +102,7 @@ router.get('/', (req, res) => {
     limitSql = `LIMIT ${pageSize} OFFSET ${(Math.max(1, page) - 1) * pageSize}`
   }
 
-  const rows = db
-    .prepare(`SELECT * FROM products ${whereSql} ORDER BY ${orderSql} ${limitSql}`)
-    .all(...params)
+  const rows = await all(`SELECT * FROM products ${whereSql} ORDER BY ${orderSql} ${limitSql}`, params)
 
   res.json({
     items: rows.map(serialize),
@@ -110,12 +110,19 @@ router.get('/', (req, res) => {
     page: Number.isInteger(page) ? Math.max(1, page) : 1,
     pageCount: pageSize > 0 ? Math.max(1, Math.ceil(total / pageSize)) : 1,
   })
+ } catch (err) {
+   next(err)
+ }
 })
 
-router.get('/:id', (req, res) => {
-  const row = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id)
-  if (!row) return res.status(404).json({ error: 'Product not found' })
-  res.json(serialize(row))
+router.get('/:id', async (req, res, next) => {
+  try {
+    const row = await get('SELECT * FROM products WHERE id = ?', [req.params.id])
+    if (!row) return res.status(404).json({ error: 'Product not found' })
+    res.json(serialize(row))
+  } catch (err) {
+    next(err)
+  }
 })
 
 export default router
