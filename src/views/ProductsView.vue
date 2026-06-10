@@ -1,8 +1,9 @@
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import FilterSidebar from '../components/FilterSidebar.vue'
+import MobileFilters from '../components/MobileFilters.vue'
 import ProductCard from '../components/ProductCard.vue'
-import { fetchProducts, fetchCatalogMeta } from '../catalog-api.js'
+import { fetchProducts, fetchCatalogMeta, fetchPriceBounds } from '../catalog-api.js'
 import { filters } from '../store.js'
 
 const PAGE_SIZE = 9
@@ -28,23 +29,45 @@ const sortBy = ref('By rating')
 const sortOpen = ref(false)
 const page = ref(1)
 
+// Mobile full-page filters
+const filtersOpen = ref(false)
+watch(filtersOpen, (open) => {
+  document.body.style.overflow = open ? 'hidden' : ''
+  if (open) window.scrollTo({ top: 0 })
+})
+function applyMobileFilters() {
+  filtersOpen.value = false
+}
+
+// Price filter
+const priceBounds = ref({ min: 0, max: 0 })
+const priceRange = ref({ min: 0, max: 0 })
+const priceNarrowed = computed(
+  () => priceRange.value.min > priceBounds.value.min || priceRange.value.max < priceBounds.value.max,
+)
+
 // Server-driven results.
 const items = ref([])
 const total = ref(0)
 const pageCount = ref(1)
 const loading = ref(false)
 
-const hasActiveFilters = computed(() =>
-  Object.values(selected.value).some((arr) => arr.length) || !!filters.search.trim(),
+const hasActiveFilters = computed(
+  () =>
+    Object.values(selected.value).some((arr) => arr.length) ||
+    !!filters.search.trim() ||
+    priceNarrowed.value,
 )
 
-// Translate the selection buckets + sort + search into API query params.
+// Translate the selection buckets + sort + search + price into API query params.
 function buildParams() {
   const params = { sort: sortBy.value, q: filters.search.trim(), page: page.value, pageSize: PAGE_SIZE }
   for (const group in selected.value) {
     const sel = selected.value[group]
     if (sel.length) params[groupProp.value[group]] = sel
   }
+  if (priceRange.value.min > priceBounds.value.min) params.minPrice = priceRange.value.min
+  if (priceRange.value.max < priceBounds.value.max) params.maxPrice = priceRange.value.max
   return params
 }
 
@@ -80,10 +103,12 @@ function reloadFromStart() {
 
 onMounted(async () => {
   try {
-    const meta = await fetchCatalogMeta()
+    const [meta, bounds] = await Promise.all([fetchCatalogMeta(), fetchPriceBounds()])
     brands.value = meta.brands
     filterGroups.value = meta.filterGroups
     sortOptions.value = meta.sortOptions
+    priceBounds.value = bounds
+    priceRange.value = { min: bounds.min, max: bounds.max }
     // ensure a selection bucket exists for every group
     selected.value = { ...emptySelection([]), ...selected.value }
   } catch (err) {
@@ -95,6 +120,7 @@ onMounted(async () => {
 
 watch(selected, reloadFromStart, { deep: true })
 watch(sortBy, reloadFromStart)
+watch(priceRange, reloadFromStart, { deep: true })
 watch(() => filters.search, reloadFromStart)
 
 const pages = computed(() => {
@@ -119,6 +145,7 @@ function pick(option) {
 function resetFilters() {
   selected.value = emptySelection([])
   filters.search = ''
+  priceRange.value = { min: priceBounds.value.min, max: priceBounds.value.max }
 }
 
 function formatPrice(n) {
@@ -134,13 +161,38 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
 
 <template>
   <section class="products-page">
-    <div class="container layout">
-      <FilterSidebar v-model="selected" :brands="brands" :groups="filterGroups" />
+    <!-- Mobile full-page filters (opened by the Filters button) -->
+    <div v-if="filtersOpen" class="container mobile-filters-wrap">
+      <MobileFilters
+        v-model="selected"
+        :brands="brands"
+        :groups="filterGroups"
+        :price-bounds="priceBounds"
+        :price="priceRange"
+        :result-count="total"
+        @update:price="priceRange = $event"
+        @apply="applyMobileFilters"
+        @close="filtersOpen = false"
+      />
+    </div>
+
+    <div v-show="!filtersOpen" class="container layout">
+      <div class="filter-panel">
+        <FilterSidebar v-model="selected" :brands="brands" :groups="filterGroups" />
+      </div>
 
       <div class="main">
         <div class="toolbar">
+          <button class="filters-btn" @click="filtersOpen = true">
+            Filters
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+              <line x1="4" y1="7" x2="20" y2="7" /><line x1="4" y1="12" x2="20" y2="12" /><line x1="4" y1="17" x2="20" y2="17" />
+              <circle cx="9" cy="7" r="2" fill="var(--white)" /><circle cx="15" cy="12" r="2" fill="var(--white)" /><circle cx="8" cy="17" r="2" fill="var(--white)" />
+            </svg>
+          </button>
+
           <p class="count">
-            Selected Products: <b>{{ total }}</b>
+            Products Result : <b>{{ total }}</b>
             <button v-if="hasActiveFilters" class="reset" @click="resetFilters">Reset filters ✕</button>
           </p>
 
@@ -195,6 +247,14 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
   grid-template-columns: 248px 1fr;
   gap: 50px;
   align-items: start;
+}
+
+/* Filters button + full-page filters are mobile-only. */
+.filters-btn {
+  display: none;
+}
+.mobile-filters-wrap {
+  padding-top: 8px;
 }
 
 .toolbar {
@@ -351,34 +411,52 @@ onUnmounted(() => document.removeEventListener('click', closeSort))
 }
 
 @media (max-width: 900px) {
-  .layout {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 600px) {
   .products-page {
     padding: 28px 0 56px;
   }
-  .toolbar {
-    flex-direction: column;
-    align-items: stretch;
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 14px;
   }
-  .count {
-    justify-content: space-between;
-    font-size: 15px;
+
+  /* Desktop sidebar hidden — mobile uses the full-page MobileFilters view. */
+  .filter-panel {
+    display: none;
+  }
+
+  /* Toolbar: [Filters] [sort] on one row, count below. */
+  .toolbar {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+  .filters-btn {
+    order: 1;
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 44px;
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--ink);
   }
   .sort {
-    width: 100%;
+    order: 2;
+    flex: 1;
+    width: auto;
   }
-}
-@media (max-width: 460px) {
-  .grid {
-    grid-template-columns: 1fr;
+  .count {
+    order: 3;
+    flex-basis: 100%;
+    font-size: 14px;
+    color: var(--muted-2);
   }
 }
 </style>

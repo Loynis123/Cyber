@@ -51,6 +51,10 @@ export async function fetchProduct(id) {
   return flattenProduct(await api.get(`/products/${id}`))
 }
 
+export async function fetchPriceBounds() {
+  return api.get('/products/meta/price')
+}
+
 export async function fetchCatalogMeta() {
   const [brands, filters, categories] = await Promise.all([
     api.get('/products/meta/brands'),

@@ -48,6 +48,14 @@ const SPEC_COLUMNS = { battery: 'battery', screen: 'screen', diagonal: 'diagonal
 router.get('/meta/brands', (_req, res) => res.json(brands))
 router.get('/meta/filters', (_req, res) => res.json({ filterGroups, sortOptions }))
 router.get('/meta/categories', (_req, res) => res.json(categories))
+router.get('/meta/price', async (_req, res, next) => {
+  try {
+    const r = await get('SELECT MIN(price) AS min, MAX(price) AS max FROM products')
+    res.json({ min: Math.floor(r.min || 0), max: Math.ceil(r.max || 0) })
+  } catch (err) {
+    next(err)
+  }
+})
 
 router.get('/', async (req, res, next) => {
  try {
@@ -66,6 +74,17 @@ router.get('/', async (req, res, next) => {
       where.push(`${col} IN (${list.map(() => '?').join(',')})`)
       params.push(...list)
     }
+  }
+
+  const minP = parseFloat(req.query.minPrice)
+  if (Number.isFinite(minP)) {
+    where.push('price >= ?')
+    params.push(minP)
+  }
+  const maxP = parseFloat(req.query.maxPrice)
+  if (Number.isFinite(maxP)) {
+    where.push('price <= ?')
+    params.push(maxP)
   }
 
   if (req.query.category) {
