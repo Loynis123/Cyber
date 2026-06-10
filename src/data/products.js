@@ -24,6 +24,7 @@ export const catalog = [
     image: '/imgs/iphone-purple.png',
     category: 'Phones',
     tabs: ['new'],
+    diagonal: '6.3"–6.7"', screen: 'OLED', memory: '128 GB', battery: '4000 mAh', protection: 'IP68',
   },
   {
     name: 'Blackmagic Pocket Cinema Camera 6k',
@@ -31,6 +32,7 @@ export const catalog = [
     image: '/imgs/camera.png',
     category: 'Cameras',
     tabs: ['new', 'featured'],
+    memory: '512 GB',
   },
   {
     name: 'Apple Watch Series 9 GPS 41mm Starlight Aluminium Case',
@@ -38,6 +40,7 @@ export const catalog = [
     image: '/imgs/watch-apple.png',
     category: 'Smart Watches',
     tabs: ['new', 'featured'],
+    diagonal: 'Up to 5.5"', screen: 'OLED', memory: '64 GB', protection: 'IP68',
   },
   {
     name: 'AirPods Max Silver',
@@ -52,6 +55,7 @@ export const catalog = [
     image: '/imgs/watch-samsung.png',
     category: 'Smart Watches',
     tabs: ['new'],
+    diagonal: 'Up to 5.5"', screen: 'AMOLED', memory: '64 GB', protection: 'IP68',
   },
   {
     name: 'Galaxy Z Fold5 Unlocked | 256GB | Phantom Black',
@@ -60,6 +64,7 @@ export const catalog = [
     category: 'Phones',
     tabs: ['new', 'featured'],
     favorite: true,
+    diagonal: '6.8"+', screen: 'Super AMOLED', memory: '256 GB', battery: '4000 mAh', protection: 'IP68',
   },
   {
     name: 'Galaxy Buds FE Graphite',
@@ -67,6 +72,7 @@ export const catalog = [
     image: '/imgs/galaxy-buds.png',
     category: 'Headphones',
     tabs: ['new'],
+    protection: 'IP67',
   },
   {
     name: 'Apple iPad 9 10.2" 64GB Wi-Fi Silver (MK2L3) 2021',
@@ -74,6 +80,7 @@ export const catalog = [
     image: '/imgs/ipad.png',
     category: 'Computers',
     tabs: ['new', 'best'],
+    diagonal: '6.8"+', screen: 'Retina', memory: '64 GB', battery: '5000 mAh', protection: 'IP67',
   },
   // Extra catalog products (surface on Bestseller / Featured and via categories)
   {
@@ -82,6 +89,7 @@ export const catalog = [
     image: '/imgs/playstation.png',
     category: 'Gaming',
     tabs: ['best', 'featured'],
+    memory: '1 TB',
   },
   {
     name: 'Apple MacBook Pro 14" M2',
@@ -89,6 +97,7 @@ export const catalog = [
     image: '/imgs/macbook.png',
     category: 'Computers',
     tabs: ['best', 'featured'],
+    diagonal: '6.8"+', screen: 'Retina', memory: '512 GB', battery: '6000+ mAh',
   },
   {
     name: 'Apple Vision Pro',
@@ -96,6 +105,7 @@ export const catalog = [
     image: '/imgs/vision-pro.png',
     category: 'Gaming',
     tabs: ['best', 'featured'],
+    screen: 'OLED', memory: '256 GB', battery: '4000 mAh',
   },
   {
     name: 'Apple iPhone 14 Pro 512GB Gold (MQ233)',
@@ -103,6 +113,7 @@ export const catalog = [
     image: '/imgs/iphone-purple.png',
     category: 'Phones',
     tabs: ['best'],
+    diagonal: '6.3"–6.7"', screen: 'OLED', memory: '512 GB', battery: '4000 mAh', protection: 'IP68',
   },
 ]
 

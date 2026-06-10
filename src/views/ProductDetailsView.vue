@@ -74,14 +74,22 @@ const related = computed(() => {
   return pool.slice(0, 4)
 })
 
-const specs = [
-  { icon: '/icons/spec-screen.png', label: 'Screen size', value: '6.7"' },
-  { icon: '/icons/spec-cpu.png', label: 'CPU', value: 'Apple A16 Bionic' },
-  { icon: '/icons/spec-cores.png', label: 'Number of Cores', value: '6' },
-  { icon: '/icons/spec-main-cam.png', label: 'Main camera', value: '48-12-12 MP' },
-  { icon: '/icons/spec-front-cam.png', label: 'Front-camera', value: '12 MP' },
-  { icon: '/icons/spec-battery.png', label: 'Battery capacity', value: '4323 mAh' },
+// Spec chips are built from the product's real fields (empty ones are skipped),
+// so every product shows its own characteristics instead of a fixed sheet.
+const SPEC_DEFS = [
+  { key: 'diagonal', label: 'Screen size', icon: '/icons/spec-screen.png' },
+  { key: 'screen', label: 'Screen type', icon: '/icons/spec-cpu.png' },
+  { key: 'memory', label: 'Built-in memory', icon: '/icons/spec-cores.png' },
+  { key: 'battery', label: 'Battery capacity', icon: '/icons/spec-battery.png' },
+  { key: 'protection', label: 'Protection', icon: '/icons/info-guarantee.png' },
 ]
+const specs = computed(() =>
+  SPEC_DEFS.filter((d) => product.value[d.key]).map((d) => ({
+    icon: d.icon,
+    label: d.label,
+    value: product.value[d.key],
+  })),
+)
 
 const guarantees = [
   { icon: '/icons/info-delivery.png', label: 'Free Delivery', value: '1-2 day' },
@@ -89,21 +97,33 @@ const guarantees = [
   { icon: '/icons/info-guarantee.png', label: 'Guaranteed', value: '1 year' },
 ]
 
-const detailsTable = [
-  { label: 'Screen diagonal', value: ['6.7"'] },
-  { label: 'The screen resolution', value: ['2796x1290'] },
-  { label: 'The screen refresh rate', value: ['120 Hz'] },
-  { label: 'The pixel density', value: ['460 ppi'] },
-  { label: 'Screen type', value: ['OLED'] },
-  {
-    label: 'Additionally',
-    value: ['Dynamic Island', 'Always-On display', 'HDR display', 'True Tone', 'Wide color (P3)'],
-  },
-  { label: 'CPU', value: ['A16 Bionic'] },
-  { label: 'Number of cores', value: ['6'] },
-  { label: 'Main camera', value: ['48-12-12 MP'] },
-  { label: 'Front-camera', value: ['12 MP'] },
-]
+const detailsTable = computed(() => {
+  const p = product.value
+  const rows = []
+  const add = (label, val) => val && rows.push({ label, value: [val] })
+  add('Brand', p.brand)
+  add('Category', p.category)
+  add('Screen diagonal', p.diagonal)
+  add('Screen type', p.screen)
+  add('Built-in memory', p.memory)
+  add('Battery capacity', p.battery)
+  add('Protection class', p.protection)
+  return rows
+})
+
+const description = computed(() => {
+  const p = product.value
+  const bits = []
+  if (p.diagonal) bits.push(`a ${p.diagonal} display`)
+  if (p.memory) bits.push(`${p.memory} of storage`)
+  if (p.battery) bits.push(`a ${p.battery} battery`)
+  const feat = bits.length ? `, featuring ${bits.join(', ')}` : ''
+  return `The ${p.name} brings together ${p.brand || 'premium'} design and dependable everyday performance${feat}.`
+})
+const detailsIntro = computed(
+  () =>
+    `Everything you need to know about the ${product.value.name} at a glance — its key specifications and characteristics are listed below.`,
+)
 
 const rating = 4.8
 const reviewCount = 125
@@ -128,9 +148,8 @@ function addToCart() {
       <nav class="crumbs">
         <router-link to="/">Home</router-link><span>›</span>
         <router-link to="/products">Catalog</router-link><span>›</span>
-        <router-link to="/products">Smartphones</router-link><span>›</span>
-        <router-link to="/products">Apple</router-link><span>›</span>
-        <span class="current">iPhone 14 Pro</span>
+        <template v-if="product.brand"><router-link to="/products">{{ product.brand }}</router-link><span>›</span></template>
+        <span class="current">{{ product.name }}</span>
       </nav>
 
       <!-- main -->
@@ -199,9 +218,7 @@ function addToCart() {
           </ul>
 
           <p class="desc">
-            Enhanced capabilities thanks to an enlarged display of 6.7 inches and work without
-            recharging throughout the day. Incredible photos both in weak and in bright light using
-            the new system with two cameras <a href="#" class="more">more...</a>
+            {{ description }} <a href="#" class="more">more...</a>
           </p>
 
           <div class="actions">
@@ -228,15 +245,7 @@ function addToCart() {
     <div class="container">
       <section class="details">
         <h2 class="section-title">Details</h2>
-        <p class="details-intro">
-          Just as a book is judged by its cover, the first thing you notice when you pick up a modern
-          smartphone is the display. Nothing surprising, because advanced technologies allow you to
-          practically level the display frames and cutouts for the front camera and speaker, leaving
-          no room for bold design solutions. And how good that in such realities Apple everything is
-          fine with displays. Both critics and mass consumers always praise the quality of the
-          picture provided by the products of the Californian brand. And last year's 6.7-inch Retina
-          panels, which had ProMotion, caused real admiration for many.
-        </p>
+        <p class="details-intro">{{ detailsIntro }}</p>
 
         <dl class="spec-table">
           <div v-for="row in detailsTable" :key="row.label" class="spec-row">
@@ -643,6 +652,9 @@ function addToCart() {
   }
 }
 @media (max-width: 560px) {
+  .crumbs {
+    display: none;
+  }
   .gallery {
     flex-direction: column-reverse;
   }
@@ -673,23 +685,37 @@ function addToCart() {
   .actions {
     flex-direction: column;
   }
+  /* Three guarantees stay in one row (as in the mobile mockup). */
   .guarantees {
-    flex-wrap: wrap;
-    gap: 16px 24px;
+    gap: 8px;
+  }
+  .guarantee {
+    flex: 1;
+    min-width: 0;
+    gap: 8px;
+  }
+  .g-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+  .g-text {
+    min-width: 0;
+  }
+  .g-label {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+  .g-value {
+    font-size: 12px;
   }
   .details {
     padding: 28px 18px;
   }
-  .spec-row {
-    flex-direction: column;
-    gap: 6px;
-  }
-  .spec-row dd {
-    align-items: flex-start;
-    text-align: left;
-  }
+  /* Related products keep a 2-up grid on phones. */
   .related-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 }
 </style>

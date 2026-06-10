@@ -381,14 +381,19 @@ async function checkout() {
     max-width: none;
   }
   .item {
-    grid-template-columns: 72px 1fr auto;
+    grid-template-columns: 64px auto 1fr auto;
     grid-template-areas:
-      'photo info remove'
-      'photo stepper price';
-    gap: 14px;
+      'photo info info info'
+      'photo stepper price remove';
+    column-gap: 12px;
+    row-gap: 14px;
+    align-items: center;
   }
   .item-photo {
     grid-area: photo;
+    align-self: center;
+    width: 64px;
+    height: 64px;
   }
   .item-info {
     grid-area: info;
@@ -398,6 +403,8 @@ async function checkout() {
   }
   .item-price {
     grid-area: price;
+    text-align: right;
+    min-width: 0;
   }
   .item-remove {
     grid-area: remove;

@@ -64,12 +64,17 @@ export async function seed() {
     r.memory = p.memory || r.memory
   }
 
-  // 2) Homepage catalog: category + section tabs (and any new products).
+  // 2) Homepage catalog: category + section tabs + any spec fields it carries.
   for (const p of catalog) {
     const r = ensure(p.name)
     if (!r.price) r.price = toNumber(p.price)
     r.image = r.image || p.image || ''
     r.category = p.category || r.category
+    r.battery = r.battery || p.battery || ''
+    r.screen = r.screen || p.screen || ''
+    r.diagonal = r.diagonal || p.diagonal || ''
+    r.protection = r.protection || p.protection || ''
+    r.memory = r.memory || p.memory || ''
     ;(p.tabs || []).forEach((t) => r.tabs.add(t))
   }
 
