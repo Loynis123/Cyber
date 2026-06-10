@@ -103,10 +103,11 @@ export async function seed() {
       battery, screen, diagonal, protection, memory, tabs, discount)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 
-  // Rewrite the products table atomically.
+  // Rewrite the products table atomically. Every statement needs an `args`
+  // array — the remote Turso (Hrana) protocol rejects statements without one.
   const statements = [
-    { sql: 'DELETE FROM products' },
-    { sql: "DELETE FROM sqlite_sequence WHERE name='products'" },
+    { sql: 'DELETE FROM products', args: [] },
+    { sql: "DELETE FROM sqlite_sequence WHERE name='products'", args: [] },
     ...rows.map((r) => ({
       sql: insertSql,
       args: [r.name, r.price, r.old_price, r.image, r.brand, r.category,
