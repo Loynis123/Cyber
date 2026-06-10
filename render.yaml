@@ -15,7 +15,9 @@ services:
     runtime: node
     plan: free
     region: frankfurt # change to your nearest region (e.g. oregon, singapore)
-    buildCommand: npm install && npm run build
+    # --include=dev forces Vite/devDependencies to install even though
+    # NODE_ENV=production is set on the service (otherwise `vite build` -> exit 127).
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     autoDeploy: true
