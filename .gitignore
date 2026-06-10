@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Production build
+dist/
+dist-ssr/
+
+# Environment / secrets
+.env
+.env.local
+*.local
+
+# Server database (lives on a persistent disk in production)
+server/data/*.db
+server/data/*.db-*
+
+# Temp / scratch (headless test harness, screenshots)
+.t/
+.t2/
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Design source / mockups (reference only — the app serves public/imgs at runtime)
+/imgs/
+/*.jpg
+/*.png
+
+# Local Claude Code settings (personal permission allowlist)
+.claude/settings.local.json

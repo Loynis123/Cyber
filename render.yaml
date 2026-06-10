@@ -1,0 +1,29 @@
+# Render Blueprint — single Node web service that serves both the built
+# Vue SPA and the Express API from one origin.
+#
+# Deploy: push to GitHub, then in Render → "New +" → "Blueprint" and point it
+# at this repo. The persistent disk keeps the SQLite database across restarts
+# and deploys (a disk requires a paid instance type).
+services:
+  - type: web
+    name: cyber-store
+    runtime: node
+    plan: starter # persistent disks are not available on the free plan
+    region: frankfurt # change to your nearest region (e.g. oregon, singapore)
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true # Render generates a strong random value once
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: DB_PATH
+        value: /var/data/cyber.db # must live on the mounted disk below
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
