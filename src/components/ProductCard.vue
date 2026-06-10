@@ -107,4 +107,36 @@ function addToCart() {
 .buy.added {
   background: #1b8f3a;
 }
+
+@media (max-width: 600px) {
+  .card {
+    padding: 12px 12px 16px;
+  }
+  .like {
+    top: 10px;
+    right: 10px;
+  }
+  .photo {
+    height: 150px;
+  }
+  .name {
+    font-size: 13px;
+    min-height: 36px;
+    margin: 6px 0 10px;
+    max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .price {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  .buy {
+    height: 42px;
+    font-size: 13px;
+    padding: 0 12px;
+  }
+}
 </style>

@@ -187,6 +187,11 @@ const filterLabel = computed(() => {
   .products {
     padding: 40px 0;
   }
+  /* Keep a 2-up product grid on phones, as in the mobile mockup. */
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
   .tabs {
     gap: 22px;
     overflow-x: auto;
@@ -202,11 +207,6 @@ const filterLabel = computed(() => {
   }
   .heading {
     font-size: 24px;
-  }
-}
-@media (max-width: 460px) {
-  .grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

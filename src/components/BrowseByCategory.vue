@@ -139,18 +139,18 @@ function step(dir) {
   }
   .grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    gap: 16px;
   }
   .chip {
-    height: 104px;
-    gap: 12px;
+    height: 150px;
+    gap: 16px;
   }
   .chip-icon {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
   }
   .chip-label {
-    font-size: 14px;
+    font-size: 15px;
   }
 }
 </style>

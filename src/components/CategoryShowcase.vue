@@ -195,62 +195,50 @@
 }
 
 @media (max-width: 600px) {
+  /* Stack full-width cells, image on top, centered text (matches mobile mockup). */
   .showcase {
     grid-template-columns: 1fr;
     grid-template-areas:
-      'ps5'
-      'macbook'
       'airpods'
-      'vision';
+      'vision'
+      'ps5'
+      'macbook';
   }
   .cell {
-    min-height: 240px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 0;
+    padding: 44px 24px 48px;
+  }
+  /* Images become normal flow elements, centered above the text. */
+  .img {
+    position: static;
+    transform: none;
+    height: auto;
+    width: auto;
+    max-width: 72%;
+    max-height: 230px;
+    margin: 0 auto 26px;
   }
   .body {
-    padding: 28px 24px !important;
-    max-width: none !important;
+    padding: 0 !important;
+    max-width: 420px !important;
     width: 100%;
   }
   .desc {
-    max-width: 60%;
-  }
-  /* Keep imagery clear of text: shrink and pin to an edge */
-  .img-ps5 {
-    left: auto;
-    right: -16px;
-    height: 52%;
-  }
-  .ps5 .desc {
-    max-width: 64%;
-  }
-  .img-mac {
-    right: -10px;
-    height: 56%;
-  }
-  .macbook .desc {
-    max-width: 60%;
-  }
-  .img-air {
-    left: auto;
-    right: 8px;
-    height: 64%;
-  }
-  .airpods .desc {
-    max-width: 58%;
-  }
-  .img-vis {
-    left: auto;
-    right: 0;
-    height: 46%;
-  }
-  .vision .desc {
-    max-width: 58%;
+    max-width: 100%;
+    margin: 0 auto;
   }
   .title-lg {
-    font-size: 28px;
+    font-size: 30px;
   }
   .title-md {
-    font-size: 22px;
+    font-size: 24px;
+  }
+  .mac-btn {
+    width: 100%;
+    margin-top: 26px;
   }
 }
 </style>

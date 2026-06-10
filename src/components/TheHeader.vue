@@ -1,7 +1,7 @@
 <script setup>
 // Icons and logo come from public/icons (exported from the design).
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { filters } from '../store.js'
 import { cartCount } from '../cart.js'
 import { favoritesCount } from '../favorites.js'
@@ -9,9 +9,11 @@ import { auth, isAuthed, logout, authModalOpen, openAuth } from '../user.js'
 import AuthModal from './AuthModal.vue'
 
 const router = useRouter()
+const route = useRoute()
 
 function submitSearch() {
   router.push('/products')
+  mobileOpen.value = false
 }
 
 const menuOpen = ref(false)
@@ -24,6 +26,7 @@ function onAccountClick() {
 function doLogout() {
   logout()
   menuOpen.value = false
+  mobileOpen.value = false
   router.push('/')
 }
 
@@ -32,6 +35,21 @@ function closeMenu() {
 }
 onMounted(() => document.addEventListener('click', closeMenu))
 onUnmounted(() => document.removeEventListener('click', closeMenu))
+
+// Mobile drawer
+const mobileOpen = ref(false)
+function closeMobile() {
+  mobileOpen.value = false
+}
+function mobileSignIn() {
+  mobileOpen.value = false
+  openAuth()
+}
+// Close the drawer whenever the route changes, and lock body scroll while open.
+watch(() => route.fullPath, closeMobile)
+watch(mobileOpen, (open) => {
+  document.body.style.overflow = open ? 'hidden' : ''
+})
 </script>
 
 <template>
@@ -79,7 +97,50 @@ onUnmounted(() => document.removeEventListener('click', closeMenu))
           </transition>
         </div>
       </div>
+
+      <!-- Mobile hamburger -->
+      <button class="burger" aria-label="Menu" @click="mobileOpen = true">
+        <span></span><span></span><span></span>
+      </button>
     </div>
+
+    <!-- Mobile drawer -->
+    <transition name="drawer">
+      <div v-if="mobileOpen" class="drawer-root">
+        <div class="drawer-overlay" @click="closeMobile"></div>
+        <aside class="drawer">
+          <div class="drawer-head">
+            <router-link to="/" class="logo" @click="closeMobile"><img src="/icons/logo.png" alt="cyber" /></router-link>
+            <button class="drawer-close" aria-label="Close menu" @click="closeMobile">✕</button>
+          </div>
+
+          <label class="drawer-search">
+            <img class="search-icon" src="/icons/search.png" alt="" />
+            <input v-model="filters.search" type="text" placeholder="Search" @keyup.enter="submitSearch" />
+          </label>
+
+          <nav class="drawer-nav">
+            <router-link to="/" @click="closeMobile">Home</router-link>
+            <router-link to="/products" @click="closeMobile">Catalog</router-link>
+            <router-link to="/favorites" @click="closeMobile">
+              Favorites <span v-if="favoritesCount" class="pill">{{ favoritesCount }}</span>
+            </router-link>
+            <router-link to="/cart" @click="closeMobile">
+              Cart <span v-if="cartCount" class="pill">{{ cartCount }}</span>
+            </router-link>
+            <router-link v-if="isAuthed" to="/orders" @click="closeMobile">My Orders</router-link>
+          </nav>
+
+          <div class="drawer-account">
+            <template v-if="isAuthed">
+              <p class="drawer-user">{{ auth.user?.name || auth.user?.email }}</p>
+              <button class="btn-outline drawer-btn" @click="doLogout">Log out</button>
+            </template>
+            <button v-else class="btn-solid drawer-btn" @click="mobileSignIn">Sign in</button>
+          </div>
+        </aside>
+      </div>
+    </transition>
 
     <AuthModal :open="authModalOpen" @close="authModalOpen = false" />
   </header>
@@ -232,33 +293,157 @@ onUnmounted(() => document.removeEventListener('click', closeMenu))
   text-align: center;
 }
 
-@media (max-width: 720px) {
-  .search {
-    width: 100%;
-    max-width: 220px;
-  }
+/* Hamburger — hidden on desktop */
+.burger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 28px;
+  height: 28px;
+  justify-self: end;
+}
+.burger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
 }
 
-@media (max-width: 480px) {
+/* Mobile drawer */
+.drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+.drawer-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+.drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(82vw, 320px);
+  background: var(--white);
+  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.18);
+  padding: 18px 22px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow-y: auto;
+}
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.drawer-head .logo img {
+  height: 24px;
+}
+.drawer-close {
+  font-size: 20px;
+  color: var(--ink);
+  padding: 4px;
+  line-height: 1;
+}
+.drawer-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 14px;
+  background: var(--search);
+  border-radius: 8px;
+}
+.drawer-search input {
+  border: none;
+  outline: none;
+  background: transparent;
+  width: 100%;
+  font-size: 15px;
+  color: var(--ink);
+}
+.drawer-nav {
+  display: flex;
+  flex-direction: column;
+}
+.drawer-nav a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+  font-size: 17px;
+  font-style: italic;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+.drawer-nav a.router-link-exact-active {
+  font-weight: 600;
+}
+.pill {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--black);
+  color: var(--white);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 20px;
+  text-align: center;
+}
+.drawer-account {
+  margin-top: auto;
+}
+.drawer-user {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  word-break: break-word;
+}
+.drawer-btn {
+  width: 100%;
+  height: 48px;
+}
+
+.drawer-enter-active,
+.drawer-leave-active {
+  transition: opacity 0.2s ease;
+}
+.drawer-enter-active .drawer,
+.drawer-leave-active .drawer {
+  transition: transform 0.25s ease;
+}
+.drawer-enter-from,
+.drawer-leave-to {
+  opacity: 0;
+}
+.drawer-enter-from .drawer,
+.drawer-leave-to .drawer {
+  transform: translateX(100%);
+}
+
+@media (max-width: 600px) {
   .header-inner {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     height: 64px;
-    gap: 10px;
   }
   .logo img {
     height: 22px;
   }
-  .search {
-    max-width: none;
-    height: 42px;
-    padding: 0 14px;
-  }
+  .search,
   .actions {
-    gap: 16px;
+    display: none;
   }
-  .icon-btn img {
-    width: 22px;
-    height: 22px;
+  .burger {
+    display: flex;
   }
 }
 </style>
