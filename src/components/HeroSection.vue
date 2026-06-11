@@ -102,7 +102,7 @@
     width: auto;
     max-width: 86%;
     max-height: 320px;
-    margin: 8px 0 36px;
+    margin: -16px 0 0;
   }
   .title {
     font-size: 38px;

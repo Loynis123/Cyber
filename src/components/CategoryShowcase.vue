@@ -28,7 +28,7 @@
     </article>
 
     <article class="cell airpods">
-      <img class="img img-air" src="/imgs/airpods-max.png" alt="Apple AirPods Max" />
+      <img class="img img-air" src="/imgs/airpods-max.webp" alt="Apple AirPods Max" />
       <div class="body">
         <h3 class="title-md">Apple<br />AirPods<br />Max</h3>
         <p class="desc">Computational audio. Listen, it's powerful</p>
