@@ -72,27 +72,32 @@
   pointer-events: none;
 }
 .img-ps5 {
-  left: -24px;
+  left: 24px;
   top: 50%;
   transform: translateY(-50%);
-  height: 76%;
+  height: 72%;
+  max-width: 270px;
 }
 .img-mac {
-  right: -10px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
-  height: 82%;
+  height: 80%;
+  max-width: 360px;
 }
 .img-air {
-  left: 4px;
-  bottom: 0;
-  height: 92%;
-}
-.img-vis {
-  left: 0;
+  left: 20px;
   top: 50%;
   transform: translateY(-50%);
-  height: 64%;
+  height: 86%;
+  max-width: 150px;
+}
+.img-vis {
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 66%;
+  max-width: 150px;
 }
 
 .ps5 {

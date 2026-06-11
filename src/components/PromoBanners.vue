@@ -81,7 +81,7 @@ function goTo(i) {
   margin-bottom: 22px;
 }
 .photo img {
-  max-width: 80%;
+  max-width: 92%;
   max-height: 100%;
   object-fit: contain;
 }

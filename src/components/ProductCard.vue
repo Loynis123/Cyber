@@ -81,7 +81,7 @@ function addToCart() {
   margin-bottom: 4px;
 }
 .photo img {
-  max-width: 78%;
+  max-width: 90%;
   max-height: 100%;
   object-fit: contain;
 }

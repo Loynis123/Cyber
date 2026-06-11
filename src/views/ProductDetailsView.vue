@@ -357,7 +357,7 @@ function addToCart() {
   min-height: 460px;
 }
 .stage img {
-  max-width: 82%;
+  max-width: 92%;
   max-height: 430px;
   object-fit: contain;
 }
