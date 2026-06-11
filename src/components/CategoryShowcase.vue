@@ -72,32 +72,32 @@
   pointer-events: none;
 }
 .img-ps5 {
-  left: 24px;
+  left: 8px;
   top: 50%;
   transform: translateY(-50%);
-  height: 72%;
-  max-width: 270px;
+  height: 88%;
+  max-width: 300px;
 }
 .img-mac {
-  right: 20px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  height: 80%;
+  height: 82%;
   max-width: 360px;
 }
 .img-air {
-  left: 20px;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 98%;
+  max-width: 190px;
+}
+.img-vis {
+  left: 8px;
   top: 50%;
   transform: translateY(-50%);
   height: 86%;
-  max-width: 150px;
-}
-.img-vis {
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  height: 66%;
-  max-width: 150px;
+  max-width: 210px;
 }
 
 .ps5 {
@@ -105,9 +105,9 @@
   background: #ffffff;
 }
 .ps5 .body {
-  padding-left: 290px;
+  padding-left: 330px;
   padding-right: 40px;
-  max-width: 620px;
+  max-width: 640px;
 }
 
 .macbook {
@@ -116,7 +116,7 @@
 }
 .macbook .body {
   padding-left: 48px;
-  max-width: 360px;
+  max-width: 250px;
 }
 
 .airpods {
@@ -124,8 +124,8 @@
   background: var(--panel);
 }
 .airpods .body {
-  padding-left: 150px;
-  padding-right: 24px;
+  padding-left: 210px;
+  padding-right: 20px;
 }
 
 .vision {
@@ -134,8 +134,8 @@
   color: var(--white);
 }
 .vision .body {
-  padding-left: 150px;
-  padding-right: 24px;
+  padding-left: 230px;
+  padding-right: 20px;
 }
 
 .title-lg {
