@@ -64,6 +64,10 @@ function addToCart() {
   right: 14px;
   color: var(--ink);
   display: inline-flex;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+.like:active {
+  transform: scale(0.85);
 }
 .like.on {
   color: var(--heart);

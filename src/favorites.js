@@ -34,7 +34,7 @@ function normaliseLocal(p) {
   return {
     key: p.key ?? p.name,
     serverId: null,
-    productId: p.productId ?? null,
+    productId: p.productId ?? p.id ?? null,
     name: p.name,
     image: p.image || '',
     price: toNumber(p.price),

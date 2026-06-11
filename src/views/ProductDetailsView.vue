@@ -684,6 +684,15 @@ function addToCart() {
   }
   .actions {
     flex-direction: column;
+    gap: 14px;
+  }
+  /* Bigger, chunkier action buttons on mobile. flex:none so the explicit
+     height isn't overridden by flex-basis:0 in the column layout. */
+  .actions .wish,
+  .actions .cart {
+    flex: none;
+    height: 64px;
+    font-size: 16px;
   }
   /* Three guarantees stay in one row (as in the mobile mockup). */
   .guarantees {
