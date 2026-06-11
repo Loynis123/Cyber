@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { get, all } from '../db.js'
-import { brands, filterGroups, sortOptions, categories } from '../catalog-meta.js'
+import { filterGroups, sortOptions, categories } from '../catalog-meta.js'
 
 const router = Router()
 
@@ -45,7 +45,17 @@ const SORT_SQL = {
 // Maps a query-param key to its products column for the spec filter groups.
 const SPEC_COLUMNS = { battery: 'battery', screen: 'screen', diagonal: 'diagonal', protection: 'protection', memory: 'memory' }
 
-router.get('/meta/brands', (_req, res) => res.json(brands))
+// Real brand counts from the catalog (brands with no products are omitted).
+router.get('/meta/brands', async (_req, res, next) => {
+  try {
+    const rows = await all(
+      "SELECT brand AS name, COUNT(*) AS count FROM products WHERE brand <> '' GROUP BY brand ORDER BY count DESC, name ASC",
+    )
+    res.json(rows)
+  } catch (err) {
+    next(err)
+  }
+})
 router.get('/meta/filters', (_req, res) => res.json({ filterGroups, sortOptions }))
 router.get('/meta/categories', (_req, res) => res.json(categories))
 router.get('/meta/price', async (_req, res, next) => {
