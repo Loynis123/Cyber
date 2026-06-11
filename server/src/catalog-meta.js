@@ -12,6 +12,10 @@ export const brands = [
   { name: 'Nokia', count: 22 },
   { name: 'Realme', count: 35 },
   { name: 'Huawei', count: 28 },
+  { name: 'Dell', count: 12 },
+  { name: 'Lenovo', count: 18 },
+  { name: 'Asus', count: 15 },
+  { name: 'Beats', count: 8 },
 ]
 
 export const filterGroups = [

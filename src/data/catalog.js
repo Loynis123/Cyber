@@ -54,4 +54,22 @@ export const productsCatalog = [
   { name: 'Apple iPad Pro 12.9" 128GB Wi-Fi Space Gray', price: 1099, image: '/imgs/ipad-pro.png', brand: 'Apple', battery: '6000+ mAh', screen: 'Retina', diagonal: '6.8"+', protection: '', memory: '128 GB' },
   { name: 'Apple Watch SE GPS 44mm Silver', price: 279, image: '/imgs/watch-apple-se.png', brand: 'Apple', battery: '', screen: 'OLED', diagonal: 'Up to 5.5"', protection: 'IP68', memory: '64 GB' },
   { name: 'Huawei FreeBuds 5i Isle Blue', price: 89.99, image: '/imgs/huawei-freebuds.png', brand: 'Huawei', battery: '', screen: '', diagonal: '', protection: '', memory: '' },
+
+  // Extra devices — varied brands & colours (real product photos).
+  { name: 'Apple iPhone 13 Pro 256GB Sierra Blue', price: 1099, image: '/imgs/iphone-13-pro.webp', brand: 'Apple', battery: '3000 mAh', screen: 'OLED', diagonal: '5.6"–6.2"', protection: 'IP68', memory: '256 GB' },
+  { name: 'Apple iPhone X 256GB Space Gray', price: 899, image: '/imgs/iphone-x.webp', brand: 'Apple', battery: '3000 mAh', screen: 'OLED', diagonal: '5.6"–6.2"', protection: 'IP67', memory: '256 GB' },
+  { name: 'Samsung Galaxy S8 64GB Midnight Black', price: 499, image: '/imgs/galaxy-s8.webp', brand: 'Samsung', battery: '3000 mAh', screen: 'Super AMOLED', diagonal: '5.6"–6.2"', protection: 'IP68', memory: '64 GB' },
+  { name: 'Samsung Galaxy S7 32GB Black Onyx', price: 299, image: '/imgs/galaxy-s7.webp', brand: 'Samsung', battery: '3000 mAh', screen: 'Super AMOLED', diagonal: 'Up to 5.5"', protection: 'IP68', memory: '64 GB' },
+  { name: 'OPPO F19 Pro+ 128GB Fluid Black', price: 399, image: '/imgs/oppo-f19.webp', brand: 'OPPO', battery: '4000 mAh', screen: 'AMOLED', diagonal: '6.3"–6.7"', protection: '', memory: '128 GB' },
+  { name: 'Realme XT 128GB Pearl Blue', price: 349, image: '/imgs/realme-xt.webp', brand: 'Realme', battery: '4000 mAh', screen: 'Super AMOLED', diagonal: '6.3"–6.7"', protection: '', memory: '128 GB' },
+  { name: 'Apple MacBook Pro 14" M1 Pro Space Grey', price: 1999, image: '/imgs/macbook-pro-14-grey.webp', brand: 'Apple', battery: '6000+ mAh', screen: 'Retina', diagonal: '6.8"+', protection: '', memory: '512 GB' },
+  { name: 'Dell XPS 13 9300 Platinum Silver', price: 1499, image: '/imgs/dell-xps-13.webp', brand: 'Dell', battery: '6000+ mAh', screen: 'IPS LCD', diagonal: '6.8"+', protection: '', memory: '512 GB' },
+  { name: 'Huawei MateBook X Pro Space Grey', price: 1399, image: '/imgs/huawei-matebook.webp', brand: 'Huawei', battery: '6000+ mAh', screen: 'IPS LCD', diagonal: '6.8"+', protection: '', memory: '512 GB' },
+  { name: 'Lenovo Yoga 920 Platinum', price: 1099, image: '/imgs/lenovo-yoga.webp', brand: 'Lenovo', battery: '6000+ mAh', screen: 'IPS LCD', diagonal: '6.8"+', protection: '', memory: '256 GB' },
+  { name: 'Asus ZenBook Pro Duo OLED', price: 1799, image: '/imgs/asus-zenbook.webp', brand: 'Asus', battery: '6000+ mAh', screen: 'OLED', diagonal: '6.8"+', protection: '', memory: '1 TB' },
+  { name: 'Apple iPad mini 2021 64GB Starlight', price: 499, image: '/imgs/ipad-mini.webp', brand: 'Apple', battery: '5000 mAh', screen: 'Retina', diagonal: '6.8"+', protection: '', memory: '64 GB' },
+  { name: 'Samsung Galaxy Tab S8+ 128GB Graphite', price: 599, image: '/imgs/galaxy-tab-s8.webp', brand: 'Samsung', battery: '6000+ mAh', screen: 'Super AMOLED', diagonal: '6.8"+', protection: '', memory: '128 GB' },
+  { name: 'Apple AirPods (2nd generation)', price: 129.99, image: '/imgs/airpods-2.webp', brand: 'Apple', battery: '', screen: '', diagonal: '', protection: '', memory: '' },
+  { name: 'Beats Flex Wireless Yuzu Yellow', price: 49.99, image: '/imgs/beats-flex.webp', brand: 'Beats', battery: '', screen: '', diagonal: '', protection: '', memory: '' },
+  { name: 'Apple Watch Series 4 GPS 44mm Gold', price: 349, image: '/imgs/watch-s4-gold.webp', brand: 'Apple', battery: '', screen: 'OLED', diagonal: 'Up to 5.5"', protection: 'IP68', memory: '' },
 ]
